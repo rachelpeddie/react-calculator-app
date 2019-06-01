@@ -10,21 +10,26 @@ class App extends Component {
     operator: ''
   }
 
-  // sets state based on input from number or decimal button click
+  // sets state based on input from number or decimal button click, takes in numbers as strings
   numberClick = ( n ) => {
     let num1;
     let num2;
     let result;
     let calculation;
-    if( this.state.result === '' ){
+    // if operator is empty string, concatenate to get num1, concatenate calculation, set result to integer num1
+    if (this.state.operator === '' ){
       num1 = num1 + n;
+      calculation = calculation + num1;
+      result = Number(num1)
+      updateState(num1, num2, calculation);
     }
-    else {
-      num2 = num2 + n;
+    // if operator is not empty string, set num1 to current result, concatenate num2, concatenate calculation
+    else { 
       num1 = this.state.result;
+      num2 = num2 + n;
+      calculation = calculation + num2;
+      calculateResult(num1, num2, calculation);
     }
-    calculation = num1 + num2;
-    calculateResult(num1, num2, calculation);
   }
 
   render(){
