@@ -10,31 +10,54 @@ class App extends Component {
     operator: ''
   }
 
-  // sets state based on input from number or decimal button click, takes in numbers as strings
-  numberClick = ( n ) => {
-    let num1;
-    let num2;
-    let result;
-    let calculation;
-    // if operator is empty string, concatenate to get num1, concatenate calculation, set result to integer num1
-    if (this.state.operator === '' ){
-      num1 = num1 + n;
-      calculation = calculation + num1;
-      result = Number(num1)
-      updateState(num1, num2, calculation);
+  operatorClick = ( o ) => {
+    let equation;
+    if (this.state.calculation !== '') {
+      equation = equation + o;
+      this.setState({
+        calculation: equation,
+        operator: o
+      })
     }
-    // if operator is not empty string, set num1 to current result, concatenate num2, concatenate calculation
-    else { 
-      num1 = this.state.result;
-      num2 = num2 + n;
-      calculation = calculation + num2;
-      calculateResult(num1, num2, calculation);
+    if (this.state.operator !== '') {
+      this.calculateResult(number1, number2, equation, o);
     }
   }
 
-  render(){
+  // sets state based on input from number or decimal button click, takes in numbers as strings
+  numberClick = ( n ) => {
+    let number1;
+    let number2;
     let answer;
     let equation;
+    // if operator is empty string, concatenate to get num1, concatenate calculation, set result to integer num1
+    if ( this.state.operator === '' ){
+      number1 = number1 + n;
+      number2 = '';
+      equation = equation + n;
+      answer = Number(number1);
+      this.updateState(number1, number2, equation, answer);
+    }
+    // if operator is not empty string, set num1 to current result, concatenate num2, concatenate equation
+    else { 
+      number1 = this.state.result;
+      number2 = number2 + n;
+      equation = equation + n;
+    }
+  }
+
+  updateState = ( number1, number2, equation, answer) => {
+    this.setState({
+      result: answer,
+      calculation: equation,
+      num1: number1,
+      num2: number2
+    })
+  }
+
+
+
+  render(){
     return (
       <div>
         <form>
