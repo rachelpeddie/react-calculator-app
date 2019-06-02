@@ -1,0 +1,28 @@
+#calc-div {
+    width: 800px;
+}
+
+input {
+    background-color: #313131;
+    width: 276px;
+    height: 80px;
+    border-style: none;
+    border: 1px solid #72bdb3;
+}
+button {
+    background-color: #313131;
+    color: #fa6956;
+    font-weight: bold;
+    border: 1px solid #fa6956;
+    width: 70px;
+    height: 70px;
+}
+
+button:hover {
+    color: #72bdb3;
+    border: 1px solid #72bdb3;
+}
+
+#equal-button {
+    width: 280px;
+}

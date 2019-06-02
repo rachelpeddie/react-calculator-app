@@ -1,4 +1,5 @@
 import React, { Component } from 'react';
+import './App.css';
 
 class App extends Component {
 
@@ -160,8 +161,9 @@ class App extends Component {
             <button value='C' onClick={() => { this.clearEquation() }}>C</button>
             <button value='+' onClick={() => { this.operatorClick() }}>+</button>
           </div>
-          <button onClick = {() => { this.calculateResult() }}>=</button>
+          <button value='=' onClick = {() => { this.calculateResult() }} id='equal-button'>=</button>
         </form>
+        {JSON.stringify(this.state)}
       </div>
     )
   }
