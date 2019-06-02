@@ -10,7 +10,7 @@ class App extends Component {
     num2: '',
     operator1: '',
     operator2: '',
-    current: ''
+    current: '',
   }
 
   // resets all state values to clear any existing operation data
@@ -21,7 +21,8 @@ class App extends Component {
       num1: '',
       num2: '',
       operator1: '',
-      operator2: ''
+      operator2: '',
+      current: '',
     })
   }
 
@@ -32,6 +33,7 @@ class App extends Component {
     let equation = this.state.equation;
     let symbol1;
     let symbol2;
+
     // if num2 is not empty, result should be calculated
     if( this.state.num2 !== ''){
       this.calculateResult();
@@ -58,7 +60,7 @@ class App extends Component {
     this.setState({
       calculation: equation,
       operator1: symbol1,
-      operator2: symbol2
+      operator2: symbol2,
     })
   }
 
@@ -67,34 +69,46 @@ class App extends Component {
   // *** TO CONSIDER *** hitting equals when num2 doesn't exist could use last operator clicked and default num2 to num1
   numberClick = ( n ) => {
     console.log(`n is`, n);
-    let number1 = this.state.num1;
+    let number1;
+    if (this.state.result === ''){
+      number1 = this.state.num1;
+    }
+    else {
+      number1 = this.state.result;
+    }
     let number2 = this.state.num2;
     let answer = this.state.result;
     let equation = this.state.calculation;
-    // if operator is empty string, concatenate to get num1, concatenate calculation, set result to integer num1
-    if ( this.state.result === '' ){
+    let current;
+    // if result is empty string, concatenate to get num1, concatenate calculation, set result to integer num1
+    if ( this.state.operator1 === '' && this.state.operator2 === '' ){
       number1 = number1 + n;
       number2 = '';
-      equation = equation + n;
-      answer = parseFloat(number1);
+      // equation = equation + n;
+      answer = number1;
+      current = number1;
       console.log(`in numberClicka, number1 is`, number1);
       console.log(`in numberClicka, number2 is`, number2);
       console.log(`in numberClicka, answer is`, answer);
       console.log(`in numberClicka, equation is`, equation);
-      this.updateNumbers(number1, number2, equation, answer);
+
     }
-    // if operator is not empty string, set num1 to current result, concatenate num2, concatenate equation
+    // if result is not empty string, set num1 to current result, concatenate num2, concatenate equation
     else { 
       number1 = this.state.result;
       number2 = number2 + n;
+      current = number2;
       console.log(`in numberClickb, number2 string is`, number2);
-      equation = equation + n;
-      this.updateNumbers(number1, number2, equation, answer);
+
+      // this.updateNumbers(number1, number2, equation, answer);
     }
+    equation = equation + n;
+    this.updateNumbers(number1, number2, equation, answer, current);
+
   }
 
   // sets state based on numberClick values
-  updateNumbers = ( number1, number2, equation, answer) => {
+  updateNumbers = ( number1, number2, equation, answer, current ) => {
     console.log(`in updateNumbers, number1 is`, number1);
     console.log(`in updateNumbers, number2 is`, number2);
     console.log(`in updateNumbers, answer is`, answer);
@@ -104,11 +118,12 @@ class App extends Component {
       calculation: equation,
       num1: number1,
       num2: number2,
+      current: current
     })
   }
 
   // evlauates last operator clicked and calculates result based on this value
-  // *** TO CONSIDER *** how to keep result displayed after clicking = button but on next button click reset to start over
+  // *** TO CONSIDER *** how to use final result if operator is clicked next, but clear values if number is clicked next
   calculateResult = () => {
     console.log(`in calculate result, num1`, this.state.num1);
     console.log(`in calculate result, num2`, this.state.num2);
@@ -118,6 +133,7 @@ class App extends Component {
     console.log(`in calculate result, number2 is`, number2);
     let symbol;
     let answer;
+    let solution;
     if( this.state.operator1 === '' ){
       symbol = this.state.operator2;
     }
@@ -126,30 +142,37 @@ class App extends Component {
     }
     console.log(`in calculate result, symbol is`, symbol);
       if( symbol === '/' ){
-        answer =  number1/number2;
+        answer =  number1 / number2;
       }
-      if( symbol === 'x' ){
-        answer = number1*number2;
+      if( symbol === '*' ){
+        answer = number1 * number2;
       }
       if( symbol === '-'){
-        answer = number1-number2;
+        answer = number1 - number2;
       }
       if( symbol === '+' ){
-        answer = number1+number2;
+        answer = number1 + number2;
       }
-    console.log(`in calculate result, answer is`, answer);
-    this.updateResult(answer);
-    return answer;
+      if (answer === Math.floor(answer)) {
+        solution = answer;
+      }
+      else {
+        solution = answer.toFixed(2);
+      }
+    this.updateResult(solution);
+    return solution;
   }
 
   // updates state with calculateResult value, rounded to nearest two decimals
   // *** TO CONSIDER *** use if(math.floor(answer) === answer{ solution = answer } ) to determine if decimals are needed
-  updateResult = ( answer ) =>{
-    let solution = answer.toFixed(2);
+  updateResult = ( solution ) =>{
+    console.log(`in updateResult`, solution);
+    
     this.setState({
       result: solution,
       num1: solution,
-      num2: ''
+      num2: '',
+      current: solution
     })
   }
 
@@ -158,7 +181,24 @@ class App extends Component {
     this.calculateResult();
     console.log(`in saveResult`, this.calculateResult());
     let newPayload = { result: this.calculateResult(), calculation: this.state.calculation }
-    this.props.dispatch({ type: 'SAVE_CALCULATION', payload: newPayload });
+    console.log(`in saveResult, payload is`, newPayload );
+    
+    // this.props.dispatch({ type: 'SAVE_CALCULATION', payload: newPayload });
+    this.finalState(newPayload.result);
+  }
+
+  finalState = (result) => {
+    console.log(`this.state.result is`, result);
+    this.setState({
+      result: '',
+      calculation: '',
+      num1: '',
+      num2: '',
+      operator1: '',
+      operator2: '',
+      current: result,
+    })
+
   }
 
   render(){
@@ -166,7 +206,7 @@ class App extends Component {
     return (
       <div>
           {/* <h1>{this.state.result}</h1> */}
-        <input value={this.state.num2}/>
+        <input value={this.state.current}/>
           <div>
             <button name='7' onClick={() => { this.numberClick('7') }}>7</button>
             <button name='8' onClick={() => { this.numberClick('8') }}>8</button>
