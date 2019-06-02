@@ -9,7 +9,8 @@ class App extends Component {
     num1: '',
     num2: '',
     operator1: '',
-    operator2: ''
+    operator2: '',
+    current: ''
   }
 
   // resets all state values to clear any existing operation data
@@ -26,7 +27,9 @@ class App extends Component {
 
   // takes in an operator, triggers calculation and changes symbols to indicate which number should be concatenated
   operatorClick = ( o ) => {
-    let equation;
+    console.log(`o is`, o);
+    
+    let equation = this.state.equation;
     let symbol1;
     let symbol2;
     // if num2 is not empty, result should be calculated
@@ -45,7 +48,9 @@ class App extends Component {
         symbol2 = o;
       }
     }
-    this.updateOperators(equation, symbol1, symbol2)
+    console.log(`in operatorClick, symbol1 is`, symbol1);
+    console.log(`in operatorClick, symbol2 is`, symbol2);
+    this.updateOperators(equation, symbol1, symbol2);
   }
 
   // sets state based on operatorClick values
@@ -61,62 +66,80 @@ class App extends Component {
   // *** NOTE *** check for redudancy with result calculation when num2 doesn't exist
   // *** TO CONSIDER *** hitting equals when num2 doesn't exist could use last operator clicked and default num2 to num1
   numberClick = ( n ) => {
-    let number1;
-    let number2;
-    let answer;
-    let equation;
+    console.log(`n is`, n);
+    let number1 = this.state.num1;
+    let number2 = this.state.num2;
+    let answer = this.state.result;
+    let equation = this.state.calculation;
     // if operator is empty string, concatenate to get num1, concatenate calculation, set result to integer num1
-    if ( this.state.operator === '' ){
+    if ( this.state.result === '' ){
       number1 = number1 + n;
       number2 = '';
       equation = equation + n;
-      answer = Number(number1);
+      answer = parseFloat(number1);
+      console.log(`in numberClicka, number1 is`, number1);
+      console.log(`in numberClicka, number2 is`, number2);
+      console.log(`in numberClicka, answer is`, answer);
+      console.log(`in numberClicka, equation is`, equation);
       this.updateNumbers(number1, number2, equation, answer);
     }
     // if operator is not empty string, set num1 to current result, concatenate num2, concatenate equation
     else { 
       number1 = this.state.result;
       number2 = number2 + n;
+      console.log(`in numberClickb, number2 string is`, number2);
       equation = equation + n;
+      this.updateNumbers(number1, number2, equation, answer);
     }
   }
 
   // sets state based on numberClick values
   updateNumbers = ( number1, number2, equation, answer) => {
+    console.log(`in updateNumbers, number1 is`, number1);
+    console.log(`in updateNumbers, number2 is`, number2);
+    console.log(`in updateNumbers, answer is`, answer);
+    console.log(`in updateNumbers, equation is`, equation);
     this.setState({
       result: answer,
       calculation: equation,
       num1: number1,
-      num2: number2
+      num2: number2,
     })
   }
 
   // evlauates last operator clicked and calculates result based on this value
   // *** TO CONSIDER *** how to keep result displayed after clicking = button but on next button click reset to start over
   calculateResult = () => {
+    console.log(`in calculate result, num1`, this.state.num1);
+    console.log(`in calculate result, num2`, this.state.num2);
     let number1 = parseFloat(this.state.num1);
     let number2 = parseFloat(this.state.num2);
+    console.log(`in calculate result, number1 is`, number1);
+    console.log(`in calculate result, number2 is`, number2);
     let symbol;
     let answer;
-    if( this.state.symbol1 === '' ){
-      symbol = this.state.symbol2;
+    if( this.state.operator1 === '' ){
+      symbol = this.state.operator2;
     }
     else{
-      symbol = this.state.symbol1;
+      symbol = this.state.operator1;
     }
-    if( symbol === '/'){
-      answer =  number1/number2;
-    }
-    if( symbol === 'x' ){
-      answer = number1*number2;
-    }
-    if( symbol === '-'){
-      answer = number1-number2;
-    }
-    if( symbol === '+'){
-      answer = number1+number2;
-    }
+    console.log(`in calculate result, symbol is`, symbol);
+      if( symbol === '/' ){
+        answer =  number1/number2;
+      }
+      if( symbol === 'x' ){
+        answer = number1*number2;
+      }
+      if( symbol === '-'){
+        answer = number1-number2;
+      }
+      if( symbol === '+' ){
+        answer = number1+number2;
+      }
+    console.log(`in calculate result, answer is`, answer);
     this.updateResult(answer);
+    return answer;
   }
 
   // updates state with calculateResult value, rounded to nearest two decimals
@@ -130,39 +153,45 @@ class App extends Component {
     })
   }
 
+
+  saveResult = () => {
+    this.calculateResult();
+    console.log(`in saveResult`, this.calculateResult());
+    let newPayload = { result: this.calculateResult(), calculation: this.state.calculation }
+    this.props.dispatch({ type: 'SAVE_CALCULATION', payload: newPayload });
+  }
+
   render(){
     // *** TO CONSIDER *** adding a button that changes number input to negative
     return (
       <div>
-        <form>
-          <h1>{this.state.result}</h1>
-          <input value={this.state.calculation}/>
+          {/* <h1>{this.state.result}</h1> */}
+        <input value={this.state.num2}/>
           <div>
-            <button value='7' onClick={() => { this.numberClick() }}>7</button>
-            <button value='8' onClick={() => { this.numberClick() }}>8</button>
-            <button value='9' onClick={() => { this.numberClick() }}>9</button>
-            <button value='/' onClick={() => { this.operatorClick() }}>/</button>
+            <button name='7' onClick={() => { this.numberClick('7') }}>7</button>
+            <button name='8' onClick={() => { this.numberClick('8') }}>8</button>
+            <button name='9' onClick={() => { this.numberClick('9') }}>9</button>
+            <button name='/' onClick={() => { this.operatorClick('/') }}>/</button>
           </div>
           <div>
-            <button value='4' onClick={() => { this.numberClick() }}>4</button>
-            <button value='5' onClick={() => { this.numberClick() }}>5</button>
-            <button value='6' onClick={() => { this.numberClick() }}>6</button>
-            <button value='*' onClick={() => { this.operatorClick() }}>x</button>
+            <button name='4' onClick={() => { this.numberClick('4') }}>4</button>
+            <button name='5' onClick={() => { this.numberClick('5') }}>5</button>
+            <button name='6' onClick={() => { this.numberClick('6') }}>6</button>
+            <button name='*' onClick={() => { this.operatorClick('*') }}>x</button>
           </div>
           <div>
-            <button value='1' onClick={() => { this.numberClick() }}>1</button>
-            <button value='2' onClick={() => { this.numberClick() }}>2</button>
-            <button value='3' onClick={() => { this.numberClick() }}>3</button>
-            <button value='-' onClick={() => { this.operatorClick() }}>-</button>
+            <button name='1' onClick={() => { this.numberClick('1') }}>1</button>
+            <button name='2' onClick={() => { this.numberClick('2') }}>2</button>
+            <button name='3' onClick={() => { this.numberClick('3') }}>3</button>
+            <button name='-' onClick={() => { this.operatorClick('-') }}>-</button>
           </div>
           <div>
-            <button value='0' onClick={() => { this.numberClick() }}>0</button>
-            <button value='.' onClick={() => { this.numberClick() }}>.</button>
-            <button value='C' onClick={() => { this.clearEquation() }}>C</button>
-            <button value='+' onClick={() => { this.operatorClick() }}>+</button>
+            <button name='0' onClick={() => { this.numberClick('0') }}>0</button>
+            <button name='.' onClick={() => { this.numberClick('.') }}>.</button>
+            <button name='C' onClick={() => { this.clearEquation('C') }}>C</button>
+            <button name='+' onClick={() => { this.operatorClick('+') }}>+</button>
           </div>
-          <button value='=' onClick = {() => { this.calculateResult() }} id='equal-button'>=</button>
-        </form>
+          <button name='=' onClick={() => { this.saveResult() }} id='equal-button'>=</button>
         {JSON.stringify(this.state)}
       </div>
     )

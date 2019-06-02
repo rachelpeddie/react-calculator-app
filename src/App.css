@@ -4,7 +4,11 @@
 
 input {
     background-color: #313131;
-    width: 276px;
+    color: #fff;
+    font-size: 34px;
+    text-align: right;
+    padding-right: 8px;
+    width: 269px;
     height: 80px;
     border-style: none;
     border: 1px solid #72bdb3;
