@@ -7,21 +7,35 @@ class App extends Component {
     calculation: '',
     num1: '',
     num2: '',
-    operator: ''
+    operator1: '',
+    operator2: ''
+  }
+
+  updateOperators = () => {
+    this.setState({
+      calculation: equation,
+      operator1: symbol1,
+      operator2: symbol2
+    })
   }
 
   operatorClick = ( o ) => {
     let equation;
+    let symbol1;
+    let symbol2;
     if (this.state.calculation !== '') {
       equation = equation + o;
-      this.setState({
-        calculation: equation,
-        operator: o
-      })
+      if (this.state.operator1 === '') {
+        symbol1 = o;
+        symbol2 = '';
+      }
+      else {
+        symbol1 = '';
+        symbol2 = o;
+      }
     }
-    if (this.state.operator !== '') {
-      this.calculateResult(number1, number2, equation, o);
-    }
+
+    this.updateOperators(equation, symbol1, symbol2)
   }
 
   // sets state based on input from number or decimal button click, takes in numbers as strings
@@ -36,7 +50,7 @@ class App extends Component {
       number2 = '';
       equation = equation + n;
       answer = Number(number1);
-      this.updateState(number1, number2, equation, answer);
+      this.updateNumbers(number1, number2, equation, answer);
     }
     // if operator is not empty string, set num1 to current result, concatenate num2, concatenate equation
     else { 
@@ -46,13 +60,19 @@ class App extends Component {
     }
   }
 
-  updateState = ( number1, number2, equation, answer) => {
+ 
+
+  updateNumbers = ( number1, number2, equation, answer) => {
     this.setState({
       result: answer,
       calculation: equation,
       num1: number1,
       num2: number2
     })
+  }
+
+  calculateResult = () => {
+
   }
 
 
@@ -87,7 +107,7 @@ class App extends Component {
             <button onClick={() => { this.operatorClick('C') }}>C</button>
             <button onClick={() => { this.operatorClick('+') }}>+</button>
           </div>
-          <button>=</button>
+          <button onClick = {() => { this.calculateResult() }}>=</button>
         </form>
       </div>
     )
