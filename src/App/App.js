@@ -141,7 +141,6 @@ class App extends Component {
   }
 
   // evlauates last operator clicked and calculates result based on this value
-  // *** TO CONSIDER *** how to use final result if operator is clicked next, but clear values if number is clicked next
   calculateResult = () => {
     console.log(`in calculate result, num1`, this.state.num1);
     console.log(`in calculate result, num2`, this.state.num2);
@@ -182,7 +181,6 @@ class App extends Component {
   }
 
   // updates state with calculateResult value, rounded to nearest two decimals
-  // *** TO CONSIDER *** use if(math.floor(answer) === answer{ solution = answer } ) to determine if decimals are needed
   updateResult = ( solution ) =>{
     console.log(`in updateResult`, solution);
     
