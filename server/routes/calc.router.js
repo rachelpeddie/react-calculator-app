@@ -6,7 +6,6 @@ const pool = require('../pool');
 
 // get last 10 operations stored in database
 router.get('/', ( req, res ) => {
-    console.log( `in calc.router get` );
     pool.query( `SELECT * FROM "calculations" ORDER BY "id" DESC LIMIT 10;` )
     .then( result => {
         res.send( result.rows );
@@ -18,7 +17,6 @@ router.get('/', ( req, res ) => {
 
 // post new equation and result to database
 router.post('/', ( req, res ) => {
-    console.log( `in calc.router post`, req.body );
     let equation = req.body.calculation;
     let solution = req.body.result;
     let sqlText = `INSERT INTO "calculations" ("equation", "solution")

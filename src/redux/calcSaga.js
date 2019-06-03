@@ -1,6 +1,7 @@
 import { takeLatest, put } from 'redux-saga/effects';
 import axios from 'axios';
 
+// sends latest calculation to server
 function* saveCalculation( action ) {
     console.log( `in saveCalculation saga`, action.payload );
     try {
@@ -12,15 +13,14 @@ function* saveCalculation( action ) {
     }
 }
 
+// gets last ten calculations from server
 function* getLastCalculations( action ) {
-    console.log(`in getLastCalculations saga`);
     try {
         const response = yield axios.get( '/calculations');
         yield put({ type: 'SET_CALCULATIONS', payload: response.data });
     }
     catch ( error ) {
         console.log(`sorry, couldn't get the last 10 calculations`, error);
-        alert(`There was an error retrieving the last 10 calculations.  Try again later.`);
     }
 }
 

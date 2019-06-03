@@ -16,6 +16,7 @@ const middlewareList = process.env.NODE_ENV === 'development' ?
     [sagaMiddleware, logger] :
     [sagaMiddleware];
 
+// creates store instance
 const store = createStore(
     calcReducer,
     // adds all middleware to our project including saga and logger
@@ -24,6 +25,7 @@ const store = createStore(
 
 sagaMiddleware.run(calcSaga);
 
+// renders to dom
 ReactDOM.render(
     <Provider store={store}>
         <App />

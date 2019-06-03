@@ -12,19 +12,13 @@ class App extends Component {
     operator1: '',
     operator2: '',
     current: '',
-    lastTen: [],
-  }
-  componentDidMount = () => {
-    setInterval(() => {
-      this.props.dispatch({ type: 'GET_LAST_CALCULATIONS' });
-    }, 5000);
   }
 
-  componentDidUpdate(prevProps) {
-    if (this.props.reduxState.calcReducer !== this.props.reduxState.calcReducer) {
-      this.setState({ ...this.state, lastTen: this.props.reduxState.calcReducer });
-      console.log(`Count:`, this.state.lastTen);
-    }
+  componentDidMount = () => {
+    // ensures last 10 calculations from all users displays for all users -- alternatively could have used web socket, decided this app wasn't big enough to warrent that implementation
+    setInterval(() => {
+      this.props.dispatch({ type: 'GET_LAST_CALCULATIONS' });
+    }, 10000);
   }
 
   // resets all state values to clear any existing operation data
@@ -73,8 +67,6 @@ class App extends Component {
         }
       }
   }
-    console.log(`in operatorClick, symbol1 is`, symbol1);
-    console.log(`in operatorClick, symbol2 is`, symbol2);
     this.updateOperators(equation, symbol1, symbol2);
   }
 
@@ -96,11 +88,11 @@ class App extends Component {
   }
 
   // sets state based on input from number or decimal button click, takes in numbers as strings
-  // *** NOTE *** check for redudancy with result calculation when num2 doesn't exist
   // *** TO CONSIDER *** hitting equals when num2 doesn't exist could use last operator clicked and default num2 to num1
   numberClick = ( n ) => {
     console.log(`n is`, n);
     let number1;
+    // sets number1 to result once first number is entered, allows for continued calculations
     if (this.state.result === ''){
       number1 = this.state.num1;
     }
@@ -115,35 +107,21 @@ class App extends Component {
     if ( this.state.operator1 === '' && this.state.operator2 === '' ){
       number1 = number1 + n;
       number2 = '';
-      // equation = equation + n;
       answer = number1;
       current = number1;
-      console.log(`in numberClicka, number1 is`, number1);
-      console.log(`in numberClicka, number2 is`, number2);
-      console.log(`in numberClicka, answer is`, answer);
-      console.log(`in numberClicka, equation is`, equation);
-
     }
     // if result is not empty string, set num1 to current result, concatenate num2, concatenate equation
     else { 
       number1 = this.state.result;
       number2 = number2 + n;
       current = number2;
-      console.log(`in numberClickb, number2 string is`, number2);
-
-      // this.updateNumbers(number1, number2, equation, answer);
     }
     equation = equation + n;
     this.updateNumbers(number1, number2, equation, answer, current);
-
   }
 
   // sets state based on numberClick values
   updateNumbers = ( number1, number2, equation, answer, current ) => {
-    console.log(`in updateNumbers, number1 is`, number1);
-    console.log(`in updateNumbers, number2 is`, number2);
-    console.log(`in updateNumbers, answer is`, answer);
-    console.log(`in updateNumbers, equation is`, equation);
     this.setState({
       result: answer,
       calculation: equation,
@@ -155,22 +133,18 @@ class App extends Component {
 
   // evlauates last operator clicked and calculates result based on this value
   calculateResult = () => {
-    console.log(`in calculate result, num1`, this.state.num1);
-    console.log(`in calculate result, num2`, this.state.num2);
     let number1 = parseFloat(this.state.num1);
     let number2 = parseFloat(this.state.num2);
-    console.log(`in calculate result, number1 is`, number1);
-    console.log(`in calculate result, number2 is`, number2);
     let symbol;
     let answer;
     let solution;
-    if( this.state.operator1 === '' ){
+      if( this.state.operator1 === '' ){
       symbol = this.state.operator2;
-    }
-    else{
-      symbol = this.state.operator1;
-    }
-    console.log(`in calculate result, symbol is`, symbol);
+      }
+      else{
+        symbol = this.state.operator1;
+      }
+      // conditinally calculates result based on last entered symbol
       if( symbol === '/' ){
         answer =  number1 / number2;
       }
@@ -183,6 +157,7 @@ class App extends Component {
       if( symbol === '+' ){
         answer = number1 + number2;
       }
+        // checks for need for decimals, if integer is passed in, integer will be returned
       if (answer === Math.floor(answer)) {
         solution = answer;
       }
@@ -195,8 +170,6 @@ class App extends Component {
 
   // updates state with calculateResult value, rounded to nearest two decimals
   updateResult = ( solution ) =>{
-    console.log(`in updateResult`, solution);
-    
     this.setState({
       result: solution,
       num1: solution,
@@ -205,19 +178,23 @@ class App extends Component {
     })
   }
 
-
+  // action to dispatch to save most recent calculation to database
   saveResult = () => {
-    this.calculateResult();
-    console.log(`in saveResult`, this.calculateResult());
-    let newPayload = { result: this.calculateResult(), calculation: this.state.calculation }
-    console.log(`in saveResult, payload is`, newPayload );
-    
-    this.props.dispatch({ type: 'SAVE_CALCULATION', payload: newPayload });
-    this.finalState(newPayload.result);
+    // checks for empty values and NaN values
+    if (this.state.num1 === '' || isNaN(this.state.num1) === true || this.state.num2 === '' || isNaN(this.state.num2) === true) {
+      alert(`Please enter valid equation.`);
+    }
+    else{ 
+      this.calculateResult();
+      // sets new payload to return of function in case state isn't updated in time to send complete data
+      let newPayload = { result: this.calculateResult(), calculation: this.state.calculation }
+      this.props.dispatch({ type: 'SAVE_CALCULATION', payload: newPayload });
+      this.finalState(newPayload.result);
+    }
   }
 
+  // sets all states to empty string except current, this will hold result value for dispay on input and use in next equation
   finalState = (result) => {
-    console.log(`this.state.result is`, result);
     this.setState({
       result: '',
       calculation: '',
@@ -230,11 +207,12 @@ class App extends Component {
 
   }
 
+  // maps through last 10 calculations and renders to DOM
   renderEquations = () => {
     return (
-      this.state.lastTen.map((calc, i) =>
-        <div>
-          <h4>{calc.equation} = {calc.result}</h4>
+      this.props.reduxState.map((calc, i) =>
+        <div key={i}>
+          <h4>{calc.equation} = {calc.solution}</h4>
         </div>
       ))
   }
@@ -242,8 +220,8 @@ class App extends Component {
   render(){
     // *** TO CONSIDER *** adding a button that changes number input to negative
     return (
+      <center>
       <div>
-          {/* <h1>{this.state.result}</h1> */}
         <input value={this.state.current}/>
           <div>
             <button name='7' onClick={() => { this.numberClick('7') }}>7</button>
@@ -273,6 +251,7 @@ class App extends Component {
         <h3>Previous Calculations</h3>
         {this.renderEquations()}
       </div>
+      </center>
     )
   }
 }
