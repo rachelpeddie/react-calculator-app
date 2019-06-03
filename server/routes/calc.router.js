@@ -2,9 +2,7 @@ const express = require('express');
 const router = express.Router();
 
 // DB CONNECTION
-const pool = require('./pool');
-
-module.exports = router;
+const pool = require('../pool');
 
 // get last 10 operations stored in database
 router.get('/', ( req, res ) => {
@@ -16,7 +14,7 @@ router.get('/', ( req, res ) => {
         console.log( `error getting the latest calculations from the database`, error );
         res.sendStatus( 500 );
     })
-})
+});
 
 // post new equation and result to database
 router.post('/', ( req, res ) => {
@@ -32,4 +30,7 @@ router.post('/', ( req, res ) => {
         console.log( `error adding your new calculation to the database`, error );
         res.sendStatus( 500 );
     })
-})
+});
+
+
+module.exports = router;

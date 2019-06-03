@@ -1,4 +1,5 @@
 import React, { Component } from 'react';
+import { connect } from 'react-redux';
 import './App.css';
 
 class App extends Component {
@@ -38,21 +39,38 @@ class App extends Component {
     if( this.state.num2 !== ''){
       this.calculateResult();
     }
-    // if calculation is not empty, operator should be concatenated
-    if (this.state.calculation !== '') {
-      equation = this.state.calculation + o;
-      if (this.state.operator1 === '') {
-        symbol1 = o;
-        symbol2 = '';
-      }
-      else {
-        symbol1 = '';
-        symbol2 = o;
-      }
+    // checks to see if previous answer is being used for next equation
+    if (this.state.calculation === '' && this.state.current !== '') {
+      this.newCalculation();
+      symbol1 = o;
+      symbol2 = '';
+      equation = this.state.current + o;
     }
+    else {
+      // if calculation is not empty, operator should be concatenated
+      if (this.state.calculation !== '') {
+        equation = this.state.calculation + o;
+        if (this.state.operator1 === '') {
+          symbol1 = o;
+          symbol2 = '';
+        }
+        else {
+          symbol1 = '';
+          symbol2 = o;
+        }
+      }
+  }
     console.log(`in operatorClick, symbol1 is`, symbol1);
     console.log(`in operatorClick, symbol2 is`, symbol2);
     this.updateOperators(equation, symbol1, symbol2);
+  }
+
+  // sets number1 state to this.state.current if new equation is started with previous result
+  newCalculation = () => {
+    this.setState({
+      num1: this.state.current,
+      result: this.state.current,
+    })
   }
 
   // sets state based on operatorClick values
@@ -183,7 +201,7 @@ class App extends Component {
     let newPayload = { result: this.calculateResult(), calculation: this.state.calculation }
     console.log(`in saveResult, payload is`, newPayload );
     
-    // this.props.dispatch({ type: 'SAVE_CALCULATION', payload: newPayload });
+    this.props.dispatch({ type: 'SAVE_CALCULATION', payload: newPayload });
     this.finalState(newPayload.result);
   }
 
@@ -232,11 +250,14 @@ class App extends Component {
             <button name='+' onClick={() => { this.operatorClick('+') }}>+</button>
           </div>
           <button name='=' onClick={() => { this.saveResult() }} id='equal-button'>=</button>
-        {JSON.stringify(this.state)}
+        <h3>Previous Calculations</h3>
       </div>
     )
   }
 }
 
+const mapReduxStateToProps = (reduxState) => ({
+  reduxState,
+});
 
-export default App;
+export default connect(mapReduxStateToProps)(App);
