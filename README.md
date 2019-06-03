@@ -5,9 +5,9 @@ A calculator application to handle simple equations.  The calculator can handle 
 
 ## Run Locally
 
-npm install
-npm run server
-npm run client
+-- npm install
+-- npm run server
+-- npm run client
 
 ## link to project on heroku
 https://gentle-stream-48608.herokuapp.com/
