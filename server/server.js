@@ -6,6 +6,9 @@ const calcRouter = require('./routes/calc.router');
 
 app.use(bodyParser.json());
 app.use(bodyParser.urlencoded({ extended: true }));
+if (process.env.NODE_ENV === 'production') {
+    app.use(express.static('client/build'));
+}
 app.use(express.static('server/public'));
 
 // ROUTES
