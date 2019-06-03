@@ -12,6 +12,19 @@ class App extends Component {
     operator1: '',
     operator2: '',
     current: '',
+    lastTen: [],
+  }
+  componentDidMount = () => {
+    setInterval(() => {
+      this.props.dispatch({ type: 'GET_LAST_CALCULATIONS' });
+    }, 5000);
+  }
+
+  componentDidUpdate(prevProps) {
+    if (this.props.reduxState.calcReducer !== this.props.reduxState.calcReducer) {
+      this.setState({ ...this.state, lastTen: this.props.reduxState.calcReducer });
+      console.log(`Count:`, this.state.lastTen);
+    }
   }
 
   // resets all state values to clear any existing operation data
@@ -217,6 +230,15 @@ class App extends Component {
 
   }
 
+  renderEquations = () => {
+    return (
+      this.state.lastTen.map((calc, i) =>
+        <div>
+          <h4>{calc.equation} = {calc.result}</h4>
+        </div>
+      ))
+  }
+
   render(){
     // *** TO CONSIDER *** adding a button that changes number input to negative
     return (
@@ -249,6 +271,7 @@ class App extends Component {
           </div>
           <button name='=' onClick={() => { this.saveResult() }} id='equal-button'>=</button>
         <h3>Previous Calculations</h3>
+        {this.renderEquations()}
       </div>
     )
   }
