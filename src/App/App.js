@@ -5,6 +5,7 @@ import './App.css';
 class App extends Component {
 
   state = {
+    endpoint: "localhost:5000",
     result: '',
     calculation: '',
     num1: '',
@@ -12,8 +13,16 @@ class App extends Component {
     operator1: '',
     operator2: '',
     current: '',
+    lastTen: []
   }
+  // sending sockets
+  send = () => {
+    const socket = socketIOClient(this.state.endpoint);
+    socket.emit('update calculations', this.state.lastTen) // check for calculations, set last ten to response
+  }
+  componentDidMount = () => {
 
+  }
   // resets all state values to clear any existing operation data
   clearEquation = () => {
     this.setState({
