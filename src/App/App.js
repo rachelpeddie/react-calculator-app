@@ -19,7 +19,7 @@ class App extends Component {
     // ensures last 10 calculations from all users displays for all users -- alternatively could have used web socket, decided this app wasn't big enough to warrent that implementation
     setInterval(() => {
       this.props.dispatch({ type: 'GET_LAST_CALCULATIONS' });
-    }, 10000);
+    }, 5000);
   }
 
   // resets all state values to clear any existing operation data
