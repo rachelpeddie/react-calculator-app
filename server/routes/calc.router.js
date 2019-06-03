@@ -9,7 +9,7 @@ module.exports = router;
 // get last 10 operations stored in database
 router.get('/', ( req, res ) => {
     console.log( `in calc.router get` );
-    pool.query( `SELECT * FROM "calculations" DESC LIMIT 10;` )
+    pool.query( `SELECT * FROM "calculations" ORDER BY "id" DESC LIMIT 10;` )
     .then( result => {
         res.send( result.rows );
     }).catch( error => {
