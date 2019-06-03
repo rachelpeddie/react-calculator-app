@@ -15,6 +15,7 @@ class App extends Component {
   }
 
   componentDidMount = () => {
+    this.props.dispatch({ type: 'GET_LAST_CALCULATIONS' });
     // ensures last 10 calculations from all users displays for all users -- alternatively could have used web socket, decided this app wasn't big enough to warrent that implementation
     setInterval(() => {
       this.props.dispatch({ type: 'GET_LAST_CALCULATIONS' });
